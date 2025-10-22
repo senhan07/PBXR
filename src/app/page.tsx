@@ -101,26 +101,34 @@ export default function Home() {
   
   // Load saved preferences from localStorage
   useEffect(() => {
-    const savedColumnOrder = localStorage.getItem('pbxrColumnOrder')
+    const savedColumnOrder = localStorage.getItem('pbxrColumnOrder');
     if (savedColumnOrder) {
       try {
-        const parsed = JSON.parse(savedColumnOrder)
-        // Validate that it contains all required columns
-        const requiredColumns = ['target', 'labels', 'module', 'prober', 'status', 'actions']
+        const parsed = JSON.parse(savedColumnOrder);
+        const requiredColumns = ['target', 'labels', 'module', 'prober', 'status', 'actions'];
         if (Array.isArray(parsed) && requiredColumns.every(col => parsed.includes(col))) {
-          setColumnOrder(parsed)
+          setColumnOrder(parsed);
         }
       } catch (error) {
-        console.error('Failed to parse saved column order:', error)
+        console.error('Failed to parse saved column order:', error);
       }
     }
-    
-    // Load saved view mode preference
-    const savedViewMode = localStorage.getItem('pbxrViewMode')
+
+    const savedViewMode = localStorage.getItem('pbxrViewMode');
     if (savedViewMode) {
-      setIsCompactView(savedViewMode === 'compact')
+      setIsCompactView(savedViewMode === 'compact');
     }
-  }, [])
+
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      fetchTargets();
+      fetchHiddenLabels();
+      fetchProbers();
+    } else {
+      router.push('/login');
+    }
+  }, []);
   const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null)
   const [labelsList, setLabelsList] = useState<{key: string, value: string}[]>([])
   const [availableLabelKeys, setAvailableLabelKeys] = useState<string[]>([])
@@ -2081,18 +2089,6 @@ export default function Home() {
       document.removeEventListener('keydown', handleEscape)
     }
   }, [showContextMenu, isMultiSelectMode, paginatedTargets])
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
-      fetchTargets()
-      fetchHiddenLabels()
-      fetchProbers()
-    } else {
-      router.push('/login')
-    }
-  }, [router])
 
   useEffect(() => {
     // Update available labels when hiddenLabels changes
