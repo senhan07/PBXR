@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String           @id @default(cuid())
+  username  String           @unique
+  password  String
+  name      String?
+  role      String           @default("user")
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  targets   BlackboxTarget[]
+  settings  Settings?
+}
+
+model Settings {
+  id                             String   @id @default(cuid())
+  prometheusAddress              String   @default("http://localhost:9090")
+  prometheusAuthMethod           String   @default("none")
+  prometheusUsername             String?
+  prometheusPassword             String?
+  prometheusBearerToken          String?
+  prometheusRefreshInterval      String   @default("1m")
+  blackboxExporterAddress        String   @default("http://localhost:9115")
+  probeEndpoint                  String   @default("/json")
+  probeEndpointEnabled           Boolean  @default(false)
+  prometheusProbeEndpoint        String   @default("/prometheus")
+  prometheusProbeEndpointEnabled Boolean  @default(false)
+  registrationEnabled            Boolean  @default(true)
+  autoLogoutMinutes              Int      @default(15)
+  autoLogoutEnabled              Boolean  @default(false)
+  userId                         String   @unique
+  createdAt                      DateTime @default(now())
+  updatedAt                      DateTime @updatedAt
+  user                           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AppSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BlackboxTarget {
+  id               String   @id @default(cuid())
+  name             String
+  url              String
+  module           String
+  labels           String?
+  enabled          Boolean  @default(true)
+  blackboxIp       String?  @default("127.0.0.1:9642")
+  targetIp         String?
+  protocol         String?  @default("icmp")
+  probeAssignments String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ProberInstance {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  address       String
+  interval      Int      @default(15)
+  scrapeTimeout Int      @default(15)
+  enabled       Boolean  @default(true)
+  description   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
