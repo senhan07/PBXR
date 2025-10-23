@@ -30,7 +30,7 @@ export function AutoLogoutProvider({ children }: AutoLogoutProviderProps) {
     // Fetch user settings on mount
     const fetchSettings = async () => {
       try {
-        const userStr = localStorage.getItem('user')
+        const userStr = typeof window !== 'undefined' ? localStorage.getItem('user') : null
         setIsLoggedIn(!!userStr)
         if (!userStr) {
           setLoading(false)
@@ -96,7 +96,7 @@ export function AutoLogoutProvider({ children }: AutoLogoutProviderProps) {
   // Re-fetch settings when pathname changes (from login to other pages)
   useEffect(() => {
     if (!shouldDisableAutoLogout) {
-      const userStr = localStorage.getItem('user')
+      const userStr = typeof window !== 'undefined' ? localStorage.getItem('user') : null
       setIsLoggedIn(!!userStr)
       if (userStr && !loading) {
         console.log('Pathname changed away from login, refetching settings...')
