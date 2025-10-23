@@ -5,20 +5,19 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    // Fetch all enabled targets and probers
+    // Fetch all targets and probers
     const [targets, probers] = await Promise.all([
       db.blackboxTarget.findMany({
         where: { enabled: true },
         orderBy: { name: 'asc' }
       }),
       db.proberInstance.findMany({
-        where: { enabled: true },
         orderBy: { name: 'asc' }
       })
     ]);
 
-    // Create a map of prober IDs to prober names for efficient lookup
-    const proberIdToNameMap = new Map(probers.map(p => [p.id, p.name]));
+    // Create a map of prober IDs to prober objects for efficient lookup
+    const proberMap = new Map(probers.map(p => [p.id, p]));
 
     // Generate the JSON content
     const result = targets
@@ -52,23 +51,22 @@ export async function GET() {
             }
           } catch (e) {
             console.error(`Failed to parse labels for target ${target.name}:`, e);
-            // Optionally, handle this case, e.g., by skipping or using default labels
           }
         }
 
         // Map assigned probe IDs to the required structure
         const targetProbes = assignedProbeIds
           .map(probeId => {
-            const probeName = proberIdToNameMap.get(probeId);
-            if (probeName) {
+            const prober = proberMap.get(probeId);
+            if (prober) {
               return {
-                probe_server: probeName,
-                __tmp_enabled: "true" // Target and Prober are both enabled
+                probe_server: prober.name,
+                __tmp_enabled: prober.enabled.toString()
               };
             }
             return null;
           })
-          .filter(p => p !== null); // Filter out any nulls if an ID was not found
+          .filter((p): p is { probe_server: string; __tmp_enabled: string } => p !== null);
 
         // If after filtering, there are no valid probes, skip the target
         if (targetProbes.length === 0) {
@@ -76,11 +74,11 @@ export async function GET() {
         }
 
         return {
-          target: target.name,
+          target: target.url, // Use target URL/address
           labels: {
             module: target.module,
+            target_name: target.name, // Add target_name label
             ...labels,
-            __tmp_enabled: 'true' // Target is enabled
           },
           probes: targetProbes
         };
