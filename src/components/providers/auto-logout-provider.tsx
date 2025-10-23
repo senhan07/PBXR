@@ -21,6 +21,7 @@ export function AutoLogoutProvider({ children }: AutoLogoutProviderProps) {
     autoLogoutMinutes: 15
   })
   const [loading, setLoading] = useState(true)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   // Check if current page should have auto logout disabled
   const shouldDisableAutoLogout = pathname === '/login'
@@ -30,6 +31,7 @@ export function AutoLogoutProvider({ children }: AutoLogoutProviderProps) {
     const fetchSettings = async () => {
       try {
         const userStr = localStorage.getItem('user')
+        setIsLoggedIn(!!userStr)
         if (!userStr) {
           setLoading(false)
           return
@@ -95,6 +97,7 @@ export function AutoLogoutProvider({ children }: AutoLogoutProviderProps) {
   useEffect(() => {
     if (!shouldDisableAutoLogout) {
       const userStr = localStorage.getItem('user')
+      setIsLoggedIn(!!userStr)
       if (userStr && !loading) {
         console.log('Pathname changed away from login, refetching settings...')
         const fetchSettings = async () => {
@@ -126,7 +129,6 @@ export function AutoLogoutProvider({ children }: AutoLogoutProviderProps) {
   }, [pathname, shouldDisableAutoLogout, loading])
 
   // Set up auto logout hook (only if not on login page and user is logged in)
-  const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('user')
   useAutoLogout({
     enabled: !shouldDisableAutoLogout && isLoggedIn && userSettings.autoLogoutEnabled,
     timeoutMinutes: userSettings.autoLogoutMinutes,
