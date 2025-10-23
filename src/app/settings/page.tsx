@@ -1031,33 +1031,10 @@ export default function SettingsPage() {
                   <div className="space-y-0.5">
                     <Label htmlFor="prometheusProbeEndpoint">Endpoint</Label>
                     <p className="text-sm text-muted-foreground">
-                      Enable to use endpoint for prometheus.yml configuration
+                      /prometheus endpoint for prometheus.yml configuration
                     </p>
                   </div>
-                  <Switch
-                    id="prometheusProbeEndpointEnabled"
-                    checked={userSettings.prometheusProbeEndpointEnabled || false}
-                    onCheckedChange={(checked) => setUserSettings(prev => ({
-                      ...prev,
-                      prometheusProbeEndpointEnabled: checked
-                    }))}
-                  />
                 </div>
-                
-                {userSettings.prometheusProbeEndpointEnabled && (
-                  <div className="space-y-2">
-                    <Label htmlFor="prometheusProbeEndpoint">Endpoint URL</Label>
-                    <Input
-                      id="prometheusProbeEndpoint"
-                      value={userSettings.prometheusProbeEndpoint || '/prometheus'}
-                      onChange={(e) => setUserSettings(prev => ({
-                        ...prev,
-                        prometheusProbeEndpoint: e.target.value
-                      }))}
-                      placeholder="/prometheus"
-                    />
-                  </div>
-                )}
               </div>
             </CardContent>
           </Card>
@@ -1416,45 +1393,9 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle>Probe Endpoint Configuration</CardTitle>
               <CardDescription>
-                Configure probe endpoints for target configuration
+                /targets endpoint for blackbox targets configuration
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Blackbox Exporter Probe Endpoint */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="probeEndpoint">Endpoint</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Enable to use probe endpoint for blackbox exporter configuration
-                    </p>
-                  </div>
-                  <Switch
-                    id="probeEndpointEnabled"
-                    checked={userSettings.probeEndpointEnabled}
-                    onCheckedChange={(checked) => setUserSettings(prev => ({
-                      ...prev,
-                      probeEndpointEnabled: checked
-                    }))}
-                  />
-                </div>
-                
-                {userSettings.probeEndpointEnabled && (
-                  <div className="space-y-2">
-                    <Label htmlFor="probeEndpoint">Endpoint URL</Label>
-                    <Input
-                      id="probeEndpoint"
-                      value={userSettings.probeEndpoint}
-                      onChange={(e) => setUserSettings(prev => ({
-                        ...prev,
-                        probeEndpoint: e.target.value
-                      }))}
-                      placeholder="/json"
-                    />
-                  </div>
-                )}
-              </div>
-            </CardContent>
           </Card>
 
           {/* Prober Actions */}
