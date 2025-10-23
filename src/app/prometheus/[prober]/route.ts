@@ -4,17 +4,22 @@ import YAML from 'yaml';
 
 const prisma = new PrismaClient();
 
-export async function GET(req: NextRequest) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { prober: string } }
+) {
+  const proberName = params.prober;
+
   try {
-    const probers = await prisma.proberInstance.findMany({
-      where: { enabled: true },
+    const prober = await prisma.proberInstance.findUnique({
+      where: { name: proberName, enabled: true },
     });
 
-    if (probers.length === 0) {
-      return new NextResponse('No enabled probers found', { status: 404 });
+    if (!prober) {
+      return new NextResponse('Prober not found or not enabled', { status: 404 });
     }
 
-    const scrapeConfigs = probers.map((prober) => ({
+    const scrapeConfig = {
       job_name: `int-${prober.interval}s-blackbox-${prober.name.toLowerCase()}`,
       scrape_interval: `${prober.interval}s`,
       scrape_timeout: `${prober.scrapeTimeout}s`,
@@ -84,11 +89,11 @@ export async function GET(req: NextRequest) {
           action: 'replace',
         },
       ],
-    }));
+    };
 
     const doc = new YAML.Document();
     doc.contents = {
-      scrape_configs: scrapeConfigs,
+      scrape_configs: [scrapeConfig],
     };
 
     return new NextResponse(doc.toString(), {
@@ -97,7 +102,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Failed to generate merged Prometheus config:', error);
+    console.error(`Failed to generate Prometheus config for prober ${proberName}:`, error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }

@@ -322,6 +322,15 @@ export default function SettingsPage() {
       return
     }
 
+    if (!/^[a-zA-Z0-9-]+$/.test(newProber.name)) {
+      toast({
+        title: "Validation Error",
+        description: "Name can only contain alphanumeric characters and hyphens.",
+        variant: "error",
+      })
+      return
+    }
+
     if (passwordData.newPassword.length < 6) {
       toast({
         title: "Validation Error", 
@@ -751,6 +760,15 @@ export default function SettingsPage() {
   const updateProber = async () => {
     if (!editingProber) return
 
+    if (!/^[a-zA-Z0-9-]+$/.test(editingProber.name)) {
+      toast({
+        title: "Validation Error",
+        description: "Name can only contain alphanumeric characters and hyphens.",
+        variant: "error",
+      })
+      return
+    }
+
     try {
       const response = await fetch(`/api/probers/${editingProber.id}`, {
         method: 'PUT',
@@ -1106,10 +1124,15 @@ export default function SettingsPage() {
                         <Input
                           id="proberName"
                           value={newProber.name}
-                          onChange={(e) => setNewProber(prev => ({
-                            ...prev,
-                            name: e.target.value
-                          }))}
+                          onChange={(e) => {
+                            const name = e.target.value;
+                            if (/^[a-zA-Z0-9-]*$/.test(name)) {
+                              setNewProber(prev => ({
+                                ...prev,
+                                name: name
+                              }))
+                            }
+                          }}
                           placeholder="e.g., prober-A"
                         />
                       </div>
@@ -1229,10 +1252,15 @@ export default function SettingsPage() {
                                 <Label>Name</Label>
                                 <Input
                                   value={editingProber.name}
-                                  onChange={(e) => setEditingProber(prev => prev ? {
-                                    ...prev,
-                                    name: e.target.value
-                                  } : null)}
+                                  onChange={(e) => {
+                                    const name = e.target.value;
+                                    if (/^[a-zA-Z0-9-]*$/.test(name)) {
+                                      setEditingProber(prev => prev ? {
+                                        ...prev,
+                                        name: name
+                                      } : null)
+                                    }
+                                  }}
                                 />
                               </div>
                               <div className="space-y-2">
