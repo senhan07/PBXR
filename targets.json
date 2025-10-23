@@ -1,0 +1,18 @@
+[
+  {
+    "id": "clx2r0y2600003b6g3g3g3g3g",
+    "name": "Example Target 1",
+    "url": "http://example.com/target1",
+    "labels": "example,target",
+    "enabled": true,
+    "prober_id": "clx2r0y2600013b6g3g3g3g3g"
+  },
+  {
+    "id": "clx2r0y2600023b6g3g3g3g3g",
+    "name": "Example Target 2",
+    "url": "http://example.com/target2",
+    "labels": "example,target",
+    "enabled": true,
+    "prober_id": "clx2r0y2600013b6g3g3g3g3g"
+  }
+]
