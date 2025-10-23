@@ -17,7 +17,6 @@ async function createCustomServer() {
     await ensureDefaultAdmin();
 
     // Create Next.js app
-    console.log('Creating Next.js app...');
     const nextApp = next({ 
       dev,
       dir: process.cwd(),
@@ -25,9 +24,7 @@ async function createCustomServer() {
       conf: dev ? undefined : { distDir: './.next' }
     });
 
-    console.log('Preparing Next.js app...');
     await nextApp.prepare();
-    console.log('Next.js app prepared.');
     const handle = nextApp.getRequestHandler();
 
     // Create HTTP server that will handle both Next.js and Socket.IO

@@ -19,6 +19,16 @@ async function main() {
 
   console.log(`Created prober with id: ${prober1.id}`);
 
+  // Get admin user
+  const adminUser = await prisma.user.findFirst({
+    where: { role: 'admin' },
+  });
+
+  if (!adminUser) {
+    console.error('Admin user not found. Please run `npm run init-admin` first.');
+    process.exit(1);
+  }
+
   // Seed Targets
   const target1 = await prisma.blackboxTarget.upsert({
     where: { id: 'clx2r0y2600003b6g3g3g3g3g' },
@@ -30,7 +40,7 @@ async function main() {
       labels: 'example,target',
       enabled: true,
       module: 'http_2xx',
-      userId: 'cmh2ynbuw0000j6i3btgt30tr',
+      userId: adminUser.id,
     },
   });
 
@@ -44,7 +54,7 @@ async function main() {
       labels: 'example,target',
       enabled: true,
       module: 'http_2xx',
-      userId: 'cmh2ynbuw0000j6i3btgt30tr',
+      userId: adminUser.id,
     },
   });
 
