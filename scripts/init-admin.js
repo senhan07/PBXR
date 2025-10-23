@@ -54,7 +54,6 @@ async function initializeDefaultAdmin() {
       data: {
         username: DEFAULT_ADMIN.username,
         password: hashedPassword,
-        email: DEFAULT_ADMIN.email,
         name: DEFAULT_ADMIN.name,
         role: DEFAULT_ADMIN.role
       }

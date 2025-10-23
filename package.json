@@ -15,6 +15,7 @@
     "setup": "node scripts/setup.js",
     "init-admin": "node scripts/init-admin.js",
     "seed-targets": "npx tsx scripts/seed-targets.ts",
+    "seed-examples": "npx tsx -r dotenv/config scripts/seed-examples.ts",
     "data-summary": "npx tsx scripts/show-data-summary.ts"
   },
   "dependencies": {
@@ -61,6 +62,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.2",
     "input-otp": "^1.4.2",
