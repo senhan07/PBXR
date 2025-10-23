@@ -1,9 +1,0 @@
-
-> nextjs_tailwind_shadcn_ts@0.1.0 start
-> NODE_ENV=production tsx server.ts
-
-Initializing default admin user...
-prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`username`, `main`.`User`.`password`, `main`.`User`.`name`, `main`.`User`.`role`, `main`.`User`.`createdAt`, `main`.`User`.`updatedAt` FROM `main`.`User` WHERE 1=1 LIMIT ? OFFSET ?
-Checking for default admin user...
-prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`username`, `main`.`User`.`password`, `main`.`User`.`name`, `main`.`User`.`role`, `main`.`User`.`createdAt`, `main`.`User`.`updatedAt` FROM `main`.`User` WHERE `main`.`User`.`role` = ? LIMIT ? OFFSET ?
-Admin user already exists: admin
