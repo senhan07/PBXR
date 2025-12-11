@@ -59,9 +59,5 @@ ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
 
-# Copy prometheus.yml and targets.json
-COPY prometheus.yml .
-COPY targets.json .
-
 # Start the application
 CMD ["npm", "run", "start"]
