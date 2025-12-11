@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "nodemon --exec \"npx tsx server.ts\" --watch server.ts --watch src --ext ts,tsx,js,jsx",
-    "build": "next build",
-    "start": "cross-env NODE_ENV=production tsx server.ts",
+    "build": "next build && tsc server.ts --outDir . --esModuleInterop --module commonjs --resolveJsonModule",
+    "start": "node server.js",
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
