@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": ".",
+    "noEmit": false
+  },
+  "include": ["server.ts", "src/lib/db.ts"]
+}

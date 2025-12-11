@@ -47,3 +47,9 @@ test
 prompt
 
 server.log
+
+# Generated server files
+server.js
+src/lib/*.js
+!src/lib/settings.js
+!src/lib/utils.js
