@@ -33,25 +33,21 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy the built application
+# Copy built application assets from the builder stage
 COPY --from=builder /app/public ./public
-
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy Prisma files and database
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/db ./db
-
-# Copy package.json, server.js, and compiled server dependencies
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=nextjs:nodejs /app/server.js ./server.js
 COPY --from=builder --chown=nextjs:nodejs /app/src/lib ./src/lib
+
+# Install full production dependencies to include server-side modules
+COPY --from=builder /app/package.json /app/package-lock.json* ./
+RUN npm install --omit=dev
+
+# Set ownership of the app directory
+RUN chown -R nextjs:nodejs /app
 
 USER nextjs
 
