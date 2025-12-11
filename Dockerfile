@@ -48,9 +48,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/db ./db
 
-# Generate Prisma client in production
-RUN npx prisma generate
-
 USER nextjs
 
 EXPOSE 3000
