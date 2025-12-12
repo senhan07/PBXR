@@ -46,8 +46,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/src/lib ./src/lib
 COPY --from=builder /app/package.json /app/package-lock.json* ./
 RUN npm install --omit=dev
 
-# Set ownership and permissions for the database directory
-RUN chown -R nextjs:nodejs /app/db && chmod -R u+w /app/db
+# Set ownership and permissions for directories the app needs to write to
+RUN chown -R nextjs:nodejs /app/.next /app/db /app/prisma && chmod -R u+w /app/.next /app/db /app/prisma
 
 USER nextjs
 
