@@ -46,8 +46,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/src/lib ./src/lib
 COPY --from=builder /app/package.json /app/package-lock.json* ./
 RUN npm install --omit=dev
 
-# Set ownership of the app directory
-RUN chown -R nextjs:nodejs /app
+# Set ownership of the database directory for Prisma
+RUN chown -R nextjs:nodejs /app/db
 
 USER nextjs
 
