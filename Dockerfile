@@ -55,6 +55,7 @@ EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV DATABASE_URL="file:./db/dev.db"
 
 # Start the application
 CMD ["npm", "run", "start"]
