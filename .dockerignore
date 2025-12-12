@@ -16,7 +16,6 @@ out/
 .env.production.local
 
 # Database
-*.db
 *.db-journal
 data/
 
