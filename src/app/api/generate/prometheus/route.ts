@@ -46,68 +46,52 @@ scrape_configs:
       // Create separate jobs for each prober in this interval group
       for (const prober of intervalProbers) {
         const jobName = `int-${intervalNum}s-blackbox-${prober.name.toLowerCase()}`
+        // Ensure timeout is not greater than interval
         const timeoutNum = Math.min(prober.scrapeTimeout || prober.interval, prober.interval)
         
-        prometheusYml += `  - job_name: ${jobName}
+        prometheusYml += `  - job_name: '${jobName}'
     scrape_interval: ${intervalNum}s
     scrape_timeout: ${timeoutNum}s
     metrics_path: /probe
     scheme: http
     file_sd_configs:
-    - files:
-      - blackbox/targets.json
-      refresh_interval: ${refreshInterval}
+      - files:
+          - 'blackbox/targets.json'
+        refresh_interval: ${refreshInterval}
     relabel_configs:
-      # 🛑 DROP CONFLICTING LABELS
-      - action: labeldrop
-        regex: ^(|__name__)$
-
-      # 🔥 EXPAND PROBES ARRAY INTO MULTIPLE TARGETS
-      - source_labels: [__meta_filepath]
-        target_label: __tmp_json
-        action: replace
-      - action: hashmod
-        source_labels: [__tmp_json]
-        modulus: 1000000
-        target_label: __tmp_id
-      - action: replace
-        source_labels: [__tmp_json, __tmp_id]
-        target_label: __address__
-        replacement: $1-$2
-
-      # 🔥 FILTER BY PROBE_SERVER ${prober.name.toUpperCase()}
+      # 1. Filter: Only keep targets meant for this specific Probe Server (${prober.name})
       - source_labels: [probe_server]
         regex: ^${prober.name}$
         action: keep
 
-      # 🔥 DROP DISABLED PROBES
+      # 2. Filter: Drop if disabled
       - source_labels: [__tmp_enabled]
-        regex: false
+        regex: "false"
         action: drop
 
-      # CLEAN UP TEMP LABELS
-      - action: labeldrop
-        regex: (__tmp_enabled|__tmp_json|__tmp_id)
-
-      # SET TARGET PARAM
-      - source_labels: [target]
+      # 3. Copy target (google.com) to parameter (?target=google.com)
+      - source_labels: [__address__]
         target_label: __param_target
         action: replace
 
-      # SET INSTANCE
-      - source_labels: [__param_target, probe_server]
-        target_label: instance
-        replacement: $1-$2
-        action: replace
-
-      # SET BLACKBOX ADDRESS
-      - replacement: ${prober.address}
-        target_label: __address__
-        action: replace
-
-      # SET MODULE
+      # 4. Copy module to parameter (?module=icmp)
       - source_labels: [module]
         target_label: __param_module
+        action: replace
+
+      # 5. SET INSTANCE: Just copy the target address to the instance label
+      - source_labels: [__param_target]
+        target_label: instance
+        action: replace
+
+      # 6. OPTIONAL: Create a visible label for the Blackbox IP
+      - target_label: probe_ip
+        replacement: ${prober.address}
+        action: replace
+
+      # 7. Finally, point the scrape to the Blackbox Exporter IP
+      - target_label: __address__
+        replacement: ${prober.address}
         action: replace
 
 `
