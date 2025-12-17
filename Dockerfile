@@ -27,40 +27,35 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy the built application
+# Copy built application assets from the builder stage
 COPY --from=builder /app/public ./public
-
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy Prisma files and database
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/db ./db
+COPY --from=builder --chown=nextjs:nodejs /app/server.js ./server.js
+COPY --from=builder --chown=nextjs:nodejs /app/src/lib ./src/lib
 
-# Generate Prisma client in production
-RUN npx prisma generate
+# Install full production dependencies to include server-side modules
+COPY --from=builder /app/package.json /app/package-lock.json* ./
+RUN npm install --omit=dev
+
+# Set ownership and permissions for the database directory
+RUN chown -R nextjs:nodejs /app/db && chmod -R u+w /app/db
 
 USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
-
-# Copy prometheus.yml and targets.json
-COPY prometheus.yml .
-COPY targets.json .
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+ENV DATABASE_URL="file:./db/dev.db"
 
 # Start the application
 CMD ["npm", "run", "start"]
